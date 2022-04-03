@@ -10,15 +10,26 @@ public abstract class Hand {
 	@Setter
 	private int index = 0;
 	@Setter
-	private float brightness = 1f;
+	private float brightness;
+	@Getter
+	private int red;
+	@Getter
+	private int blue;
+	@Getter
+	private int green;
+
 	private final int numberOfLED;
 
-	public Hand(int numberOfLED) {
+	public Hand(int numberOfLED, float brightness, int red, int blue, int green) {
+		this.brightness = brightness;
+		this.red = red;
+		this.blue = blue;
+		this.green = green;
 		this.numberOfLED = numberOfLED;
 	}
 
 	public void switchBy180Degrees() {
-		int newIndex = ((index + numberOfLED/2) % numberOfLED);
+		int newIndex = ((index + numberOfLED / 2) % numberOfLED);
 		setIndex(newIndex);
 	}
 }

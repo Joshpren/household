@@ -19,42 +19,10 @@ public class Pixel {
 	private int red = 0;
 	private int green = 0;
 	private int blue = 0;
-
-	public static void main(String[] args) {
-		Pixel[] lightstrip = new Pixel[60];
-
-		for (int i = 0; i < lightstrip.length; i++) {
-			lightstrip[i] = new Pixel();
-		}
-
-		LocalDateTime now = LocalDateTime.of(2022, Month.MARCH, 29, 18, 1, 10);
-		System.out.println(now);
-		int seconds = now.getSecond();
-		int minute = now.getMinute() - 1;
-		int hour = now.getHour();
-		int position = determinePositionOfHour(hour, minute);
-
-		lightstrip[position].setBrightnessInPercent(1.0f);
-		lightstrip[position].setRed(255);
-		lightstrip[position].setGreen(255);
-		lightstrip[position].setBlue(255);
-
-		lightstrip[minute].setBrightnessInPercent(0.8f);
-		lightstrip[minute].setRed(255);
-		lightstrip[minute].setGreen(255);
-		lightstrip[minute].setBlue(255);
-
-		lightstrip[seconds].setBrightnessInPercent(0.9f);
-		lightstrip[seconds].setRed(200);
-		lightstrip[seconds].setGreen(200);
-		lightstrip[seconds].setBlue(200);
-
-		for (int i = 0; i < lightstrip.length; i++) {
-			System.out.println(i + 1 + ". " + lightstrip[i]);
-		}
-
-		System.out.println("45 auf 15: " + adaptedLightIndex(45));
-		System.out.println("10 auf 40: " + adaptedLightIndex(10));
+	private int index;
+	
+	public Pixel(int index) {
+		this.index = index;
 	}
 
 	private static int adaptedLightIndex(int i) {
@@ -66,6 +34,27 @@ public class Pixel {
 		int americanHourCount = hour - 12;
 		int delay = 5 * (minute / 60);
 		return (americanHourCount * 5) + delay;
+	}
+
+	public void setWhite(float brightness) {
+		setBlue(255);
+		setGreen(255);
+		setRed(255);
+		setBrightnessInPercent(brightness);
+	}
+
+	public void clear() {
+		this.red = 0;
+		this.blue = 0;
+		this.green = 0;
+		this.brightnessInPercent = 0;
+	}
+
+	public void setConfiguration(Hand hand) {
+		this.red = hand.getRed();
+		this.blue = hand.getBlue();
+		this.green = hand.getGreen();
+		this.brightnessInPercent = hand.getBrightness();
 	}
 
 }

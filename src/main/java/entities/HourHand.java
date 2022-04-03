@@ -1,9 +1,9 @@
 package entities;
 
 public class HourHand extends Hand {
-
+	
 	public HourHand(int numberOfLED) {
-		super(numberOfLED);
+		super(numberOfLED, 80, 255, 255, 255);
 	}
 	
 	public void setHour(int militaryHour, int minutes) {
