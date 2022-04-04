@@ -56,5 +56,4 @@ public class Pixel {
 		this.green = hand.getGreen();
 		this.brightnessInPercent = hand.getBrightness();
 	}
-
 }

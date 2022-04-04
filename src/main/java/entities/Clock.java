@@ -8,41 +8,59 @@ import java.util.function.Consumer;
 import fsm.OrdinalState;
 import fsm.State;
 import fsm.SundialState;
+import fsm.TimerState;
 import io.vertx.core.Vertx;
+import lombok.Getter;
+import lombok.Setter;
 
 public class Clock {
 
-	LEDStrip ledStrip = new LEDStrip(60);
-	private State state = new OrdinalState(ledStrip, this::display);
-//	private final Vertx vertx = Vertx.vertx();
+	private final LEDStrip ledStrip = new LEDStrip(120);
+	private final Vertx vertx = Vertx.vertx();
+	@Setter
+	@Getter
+	private long currentTimer = -1;
+	private State state = new OrdinalState(vertx, this::setCurrentTimer, ledStrip, this::display);
 
 	public static void main(String[] args) throws InterruptedException {
 		Clock clock = new Clock();
 		Scanner scan = new Scanner(System.in);
-		clock.state.display();
+		clock.state.start();
 		while (true) {
 			int nextInt = scan.nextInt();
 			if (nextInt == 1) {
+				clock.state.reactOnMotion();
 				while (nextInt != 0) {
-					clock.state.reactOnMotion();
 					nextInt = scan.nextInt();
 				}
-
+				clock.vertx.cancelTimer(clock.currentTimer);
+			}
+			if (nextInt == 7) {
+				clock.vertx.cancelTimer(clock.currentTimer);
+				int hours  = scan.nextInt();
+				int minutes  = scan.nextInt();
+				int seconds  = scan.nextInt();
+				clock.switchToState(new TimerState(clock.vertx,clock::setCurrentTimer, clock.ledStrip, clock::display, hours, minutes, seconds));
+			}
+			if (nextInt == 8) {
+				clock.vertx.cancelTimer(clock.currentTimer);
+				clock.switchToState(new OrdinalState(clock.vertx,clock::setCurrentTimer, clock.ledStrip, clock::display));
 			}
 			if (nextInt == 9) {
-				clock.switchToState(new SundialState(clock.ledStrip, clock::display));
+				clock.vertx.cancelTimer(clock.currentTimer);
+				clock.switchToState(new SundialState(clock.vertx,clock::setCurrentTimer, clock.ledStrip, clock::display));
 			}
 			if (nextInt == 100) {
 				break;
 			}
-			clock.state.display();
 		}
 		scan.close();
+		clock.vertx.close();
 	}
 
 	public void switchToState(State state) {
 		this.state = state;
-		this.state.start(0);
+		this.state.start();
 	}
 
 	public void display(LEDStrip ledstrip) {

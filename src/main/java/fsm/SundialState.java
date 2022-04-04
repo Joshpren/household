@@ -6,27 +6,30 @@ import java.util.stream.Stream;
 
 import entities.LEDStrip;
 import entities.Pixel;
+import io.vertx.core.Vertx;
 
 public class SundialState extends State {
 
-	public SundialState(LEDStrip ledStrip, Consumer<LEDStrip> change) {
-		super(ledStrip, change);
+	public SundialState(Vertx vertx, Consumer<Long> currentTimer, LEDStrip ledStrip, Consumer<LEDStrip> change) {
+		super(vertx, currentTimer, ledStrip, change);
 	}
 
 	@Override
-	public Pixel[] display() {
-		getLedStrip().setAmbient(1.0f);
+	public void display() {
 		getChange().accept(getLedStrip());
-		return null;
 	}
 
 	@Override
-	public Pixel[] reactOnMotion() {
+	public void reactOnMotion() {
+		calculatePositions();
+	}
+
+	public void calculatePositions() {
 		LocalDateTime currentTime = getCurrentTime();
 		int hour = currentTime.getHour();
 		int minute = currentTime.getMinute();
 		int second = currentTime.getSecond();
-		
+
 		getHourHand().setHour(hour, minute);
 		getMinuteHand().setMinute(minute, second);
 		getSecondHand().setSecond(second);
@@ -38,14 +41,14 @@ public class SundialState extends State {
 		getLedStrip().setHand(getMinuteHand());
 		getLedStrip().setHand(getSecondHand());
 
-		getChange().accept(getLedStrip());
-		return null;
+		display();
+		setCurrentTimer(getVertx().setTimer(getVertxTimerDuration(), ignored -> calculatePositions()));
 	}
 
 	@Override
-	public void start(int lent) {
-		// TODO Auto-generated method stub
-
+	public void start() {
+		getLedStrip().setAmbient(1.0f);
+		getChange().accept(getLedStrip());
 	}
 
 }

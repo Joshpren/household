@@ -10,9 +10,7 @@ public class LEDStrip {
 	private final Pixel[] pixels;
 
 	public LEDStrip(int numberOfPixel) {
-		this.pixels = IntStream.range(0,numberOfPixel)
-				.mapToObj(index -> new Pixel(index))
-				.toArray(Pixel[]::new);
+		this.pixels = IntStream.range(0, numberOfPixel).mapToObj(index -> new Pixel(index)).toArray(Pixel[]::new);
 	}
 
 	public int getLength() {
@@ -35,7 +33,16 @@ public class LEDStrip {
 			System.out.println(pixel);
 		}
 	}
-	
+
+	public void lightUpTill(int index) {
+		for (int i = 0; i < index; i++) {
+			pixels[i].setWhite(1);
+		}
+		for(int i = index; i<pixels.length; i++) {
+			pixels[i].clear();
+		}
+	}
+
 	public void setAmbient(float brightness) {
 		for (Pixel pixel : pixels) {
 			pixel.setWhite(brightness);

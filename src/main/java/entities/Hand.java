@@ -2,8 +2,10 @@ package entities;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
+@ToString
 public abstract class Hand {
 
 	public static final int TWELVE_HOUR_SYSTEM = 12;

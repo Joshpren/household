@@ -8,42 +8,46 @@ import java.util.stream.Stream;
 
 import entities.LEDStrip;
 import entities.Pixel;
+import io.vertx.core.Vertx;
 
 public class OrdinalState extends State {
 
-	public OrdinalState(LEDStrip ledStrip, Consumer<LEDStrip> change) {
-		super(ledStrip, change);
+	public OrdinalState(Vertx vertx, Consumer<Long> currentTimer, LEDStrip ledStrip, Consumer<LEDStrip> change) {
+		super(vertx, currentTimer, ledStrip, change);
 	}
 
 	@Override
-	public Pixel[] display() {
+	public void display() {
+		getChange().accept(getLedStrip());
+		
+	}
+
+	public void calculatePositions() {
 		LocalDateTime currentTime = getCurrentTime();
 		int hour = currentTime.getHour();
 		int minute = currentTime.getMinute();
 		int second = currentTime.getSecond();
-		
+
 		getHourHand().setHour(hour, minute);
 		getMinuteHand().setMinute(minute, second);
 		getSecondHand().setSecond(second);
-		
+
 		getLedStrip().clear();
 		getLedStrip().setHand(getHourHand());
 		getLedStrip().setHand(getMinuteHand());
 		getLedStrip().setHand(getSecondHand());
 
-		getChange().accept(getLedStrip());
-		return  null;
-	}
-	
-
-	@Override
-	public Pixel[] reactOnMotion() {
-		return null;
-	}
-
-	@Override
-	public void start(int lent) {
 		display();
+		setCurrentTimer(getVertx().setTimer(getVertxTimerDuration(), ignored -> calculatePositions()));
+	}
+
+	@Override
+	public void reactOnMotion() {
+	}
+
+	@Override
+	public void start() {
+		calculatePositions();
 	}
 
 }
